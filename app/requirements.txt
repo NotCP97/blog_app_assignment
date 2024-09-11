@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+elasticsearch==7.13.1
+redis
+rq
+supervisor
