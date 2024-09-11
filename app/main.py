@@ -6,6 +6,10 @@ from consumer import process_blog_post
 from clients import RedisHandler, ElasticsearchHandler
 from app_scripts import lifespan
 import uuid
+from loggerz import get_logger
+
+
+logger = get_logger()
 
 app = FastAPI(lifespan=lifespan)
 

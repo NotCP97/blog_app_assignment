@@ -2,10 +2,12 @@ from clients import ElasticsearchHandler, RedisHandler
 
 from rq import Worker, Queue, Connection
 from hashlib import md5
+from loggerz import get_logger
+
+logger = get_logger()
 
 
 es_handler = ElasticsearchHandler()
-
 
 
 def process_blog_post(blog_post) -> str:
@@ -18,7 +20,7 @@ def process_blog_post(blog_post) -> str:
     :rtype: str
     
     """
-    print(f"Processing blog post: {blog_post['title']}")
+    logger.info(f"Processing blog post: {blog_post['title']}")
     # checking if new blog is not duplicate
 
     blog_hash = md5((blog_post["text"]+blog_post["title"]).encode()).hexdigest()  # we can add user_id to the hash to make it unique for the user

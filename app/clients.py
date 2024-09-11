@@ -46,7 +46,7 @@ class ElasticsearchHandler:
     This class will handle all the elasticsearch operations
     """
     def __init__(self):
-        self.es = Elasticsearch([ELASTICSEARCH_URL], wait_for_status='green')
+        self.es = Elasticsearch([ELASTICSEARCH_URL])
 
     # write a method to search data in elasticsearch
     def get_results(self, index, body, from_=0, size=10) -> list:
@@ -97,7 +97,6 @@ class ElasticsearchHandler:
         :rtype: dict
         """
         result =  self.es.get(index=index, id=id, ignore=404)
-        print(result)
 
         if result.get("found"):
             return result["_source"]
