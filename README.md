@@ -4,6 +4,12 @@ Hi readers,
 
 Creating this repository as part of CloudSEK recruitment assignment.
 
+Assumption  - We dont have separate redis and elastic search db
+
+
+Currently service supports for limited user_ids
+ - user1, user2, user3, user4, user5 (Can be improved with sign-up and login functionality)
+
 This repository contains a simple, scalable blogging service designed to allow users to submit and search blog entries. The service includes the following core components:
 
 1. **Blog Submission API** (FastAPI-based)
