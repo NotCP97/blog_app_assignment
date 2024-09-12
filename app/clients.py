@@ -49,7 +49,7 @@ class ElasticsearchHandler:
         self.es = Elasticsearch([ELASTICSEARCH_URL])
 
     # write a method to search data in elasticsearch
-    def get_results(self, index, body, from_=0, size=10) -> list:
+    def get_results(self, index, body, size=10000) -> list:
         """
         This method will search data in elasticsearch with pagination
         
@@ -64,10 +64,10 @@ class ElasticsearchHandler:
         :return: Search results
         :rtype: list
         """
-        body.update({"from": from_, "size": size})
-        search_results = self.es.search(index=index, body=body)
+        search_results = self.es.search(index=index, body=body, size=size)
 
-        return search_results
+
+        return [result["_source"] for result in search_results["hits"]["hits"]]
     
 
     def index_doc(self, index, body, doc_id=None):
@@ -102,6 +102,34 @@ class ElasticsearchHandler:
             return result["_source"]
         else:
             return {}
+        
+    def get_results_with_pagination(self, index, body, from_=0, size=10):
+        """
+        This method will search data in elasticsearch with pagination
+
+        :param index: Index name
+        :type index: str
+        :param body: Search query
+        :type body: dict
+        :param from_: Starting index for pagination
+        :type from_: int
+        :param size: Number of results to return
+        :type size: int
+        :return: Search results
+        :rtype: dict
+        """
+        body.update({"from": from_, "size": size})
+        search_results = self.es.search(index=index, body=body)
+
+        start = from_
+        end = from_ + size if from_ + size < search_results["hits"]["total"]["value"] else from_+search_results["hits"]["total"]["value"]
+
+        return {
+            "data": [result["_source"] for result in search_results["hits"]["hits"]],
+            "total_results": search_results["hits"]["total"]["value"],
+            "from": start,
+            "to": end
+        }
 
     # write a method to close the elasticsearch connection
     def close(self):

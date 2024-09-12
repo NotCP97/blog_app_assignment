@@ -6,8 +6,6 @@ class BlogPost(BaseModel):
     user_id: str
 
     
-
-
 class UserLogin(BaseModel):
     username: str
     password: str

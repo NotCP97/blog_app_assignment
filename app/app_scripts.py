@@ -3,7 +3,7 @@ from fastapi import FastAPI
 from clients import ElasticsearchHandler
 from elastic_mapping import blog_index_mapping, job_index_mapping
 from elasticsearch import exceptions
-import time
+import time, sys
 from loggerz import get_logger
 
 
@@ -12,7 +12,7 @@ logger = get_logger()
 def start_up():
     es_handler = ElasticsearchHandler()
 
-    retries = 5  # Number of retries before exiting
+    retries = 100  # Number of retries before exiting
     for i in range(retries):
         try:
             if es_handler.es.ping():
@@ -26,13 +26,18 @@ def start_up():
                     logger.info("Created index 'submitted_jobs'")
                 break
             else:
-                logger.info(f"Attempt {i + 1}/{retries} failed to connect to Elasticsearch. Retrying in 5 seconds...")
-                time.sleep(5)
+                logger.info(f"Attempt {i + 1}/{retries} failed to connect to Elasticsearch. Retrying in 10 seconds...")
+                time.sleep(10)
         except exceptions.ConnectionError:
-            logger.info(f"Attempt {i + 1}/{retries} failed to connect to Elasticsearch. Retrying in 5 seconds...")
-            time.sleep(5)
+            logger.info(f"Attempt {i + 1}/{retries} failed to connect to Elasticsearch. Retrying in 10 seconds...")
+            time.sleep(10)
 
-    es_handler.es.close()
+    if es_handler.es.ping():
+        logger.info("Successfully connected to Elasticsearch")
+
+    else:
+        logger.error("Failed to connect to Elasticsearch. Exiting...")
+        sys.exit(1)
 
     logger.info("Starting up...")
 

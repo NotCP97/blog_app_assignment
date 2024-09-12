@@ -1,26 +1,27 @@
 from fastapi import FastAPI, HTTPException
 from model import BlogPost
 import time
-from rq import Queue
 from consumer import process_blog_post
 from clients import RedisHandler, ElasticsearchHandler
 from app_scripts import lifespan
 import uuid
 from loggerz import get_logger
 
+from es_queries import search_blogs_query, user_blogs_query, user_submitted_blogs_query
+
 
 logger = get_logger()
 
-app = FastAPI(lifespan=lifespan)
+app = FastAPI(lifespan=lifespan, docs_url="/api/docs", redoc_url="/api/redoc")
 
 es_handler = ElasticsearchHandler()
 redis_handler = RedisHandler()
 
+
+
 @app.get("/health_check")
 def health_check():
     return {"status": "ping pong"}
-
- 
 
 @app.post("/blogs/submit")
 async def submit_blog(blog: BlogPost):
@@ -36,79 +37,51 @@ async def submit_blog(blog: BlogPost):
     blog_data["created_at"] = int(time.time()*1000)
     blog_data["job_id"] = job_id
 
-    # we should index this blog job id to elasticsearch with status as submitted for the user to check the status of the job before sending it to the queue
+    submit_blog_doc = {
+        "status": "submitted",
+        "user_id": blog.user_id,
+        "title": blog.title,
+        "created_at": blog_data["created_at"]
+    }
+
+    _ = es_handler.index_doc(index="submitted_jobs", body=submit_blog_doc, doc_id=job_id)
     
     job = redis_handler.add_job(process_blog_post, blog_data, job_id=job_id)
     return {"message": "Blog post submitted successfully", "job_id": job.id}
 
+@app.get("/blogs/status/{job_id}")
+def get_blog_status(job_id: str):
+    """
+    This endpoint will return the status of the blog post
+    """
+    data =  es_handler.get_result_by_id(index="submitted_jobs", id=job_id)
+    if not data:
+        raise HTTPException(status_code=404, detail="Job not found")
+    return {"data": data}
+
 @app.get("/blogs/search")
-def search_blogs(query: str,user_id: str = None, from_: int = 0, size: int = 10):
+def search_blogs(query: str = None,user_id: str = None, from_: int = 0, size: int = 10):
     """
     This endpoint will search the blogs in elasticsearch
     """
-    body = {
-        "query": {
-            "multi_match": {
-                "query": query,
-                "fields": ["title", "text"]
-            }
-        },
-        "sort": {
-            "created_at": {"order": "desc"}
-        },
-        "_source": ["title", "text", "user_id", "created_at"]
-    }
-    if user_id:
-        body["query"]["bool"] = {
-            "filter": {
-                "term": {
-                    "user_id": user_id
-                }
-            }
-        }
-
-    results = es_handler.get_results(index="blogs", body=body, from_=from_, size=size)
-    return {"data": [result["_source"] for result in results["hits"]["hits"]], "total_hits": results["hits"]["total"]["value"]}
     
-@app.get("/blogs/user_blogs")
+    body = search_blogs_query(query=query, user_id=user_id)
+    
+    return es_handler.get_results_with_pagination(index="blogs", body=body, from_=from_, size=size)
+    
+@app.get("/blogs/user_blogs/{user_id}")
 def user_blogs(user_id: str, from_: int = 0, size: int = 10):
-    body = {
-        "query": {
-            "bool": {
-                "filter": {
-                "term": {
-                    "user_id": user_id
-                }
-            }
-            }
-        },
+    
+    body = user_blogs_query(user_id=user_id)
+    
+    return es_handler.get_results_with_pagination(index="blogs", body=body, from_=from_, size=size)
 
-        "sort": {
-            "created_at": {"order": "desc"}
-        },
-        "_source": ["title", "text", "user_id", "created_at"]
-    }
-    results = es_handler.get_results(index="blogs", body=body, from_=from_, size=size)
-    return {"data": [result["_source"] for result in results["hits"]["hits"]], "total_hits": results["hits"]["total"]["value"]}
-
-@app.get("/blogs/user_submitted_blogs")
+@app.get("/blogs/user_submitted_blogs/{user_id}")
 def user_submitted_blogs(user_id: str, from_: int = 0, size: int = 10):
-    body = {
-        "query": {
-            "bool": {
-                "filter": {
-                "term": {
-                    "user_id": user_id
-                }
-            }
-            }
-        },
-        "sort": {
-            "created_at": {"order": "desc"}
-        }
-    }
-    results = es_handler.get_results(index="submitted_jobs", body=body, from_=from_, size=size)
-    return {"data": [result["_source"] for result in results["hits"]["hits"]], "total_hits": results["hits"]["total"]["value"]}
+    
+    body = user_submitted_blogs_query(user_id=user_id)
+    
+    return es_handler.get_results_with_pagination(index="submitted_jobs", body=body, from_=from_, size=size)
 
 if __name__ == "__main__":
     import uvicorn
