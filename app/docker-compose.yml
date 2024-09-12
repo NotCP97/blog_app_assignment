@@ -54,12 +54,14 @@ services:
       - redis
       - fastapi
       - elasticsearch
+    ports:
+      - "9181:9181"
     environment:
       - REDIS_URL=redis://redis:6379
       - ELASTICSEARCH_URL=http://elasticsearch:9200
       - WORKERS_COUNT=1
       - QUEUE=blog_processing_queue
-    command: python3 consumer.py
+    command: supervisord -c supervisord.conf
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://elasticsearch:9200/_cat/health || exit 1"]
       interval: 20s
