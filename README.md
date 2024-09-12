@@ -78,6 +78,7 @@ This will start:
 1. FastAPI service on http://localhost:8000
 2. Redis queue on http://localhost:6379
 3. Elasticsearch on http://localhost:9200
+4. Swagger-UI for FastAPI service on http://localhost:8000/api/docs
 
 
 # APIs
