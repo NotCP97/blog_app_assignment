@@ -21,7 +21,7 @@ All components are containerized using Docker, and the project includes deployme
 - [APIs](#apis)
 - [Testing](#testing)
 - [Improvements](#improvements)
-- - [Deployment](#deployment)
+- [Deployment](#deployment)
 
 # Architecture
 
@@ -123,7 +123,9 @@ Response:
       "title": "njdnj"
     }
   ],
-  "total_hits": 1
+  "total_hits": 1,
+  "start": 0,
+  "end":1
 }
 ```
 
@@ -150,7 +152,9 @@ Response:
       "title": "njdnj"
     }
   ],
-  "total_hits": 1
+  "total_hits": 1,
+   "start": 0,
+   "end":1
 }
 ```
 
@@ -188,9 +192,34 @@ Response:
       "error": ""
     }
   ],
-  "total_hits": 3
+   "total_hits": 3
+   "start": 0,
+   "end":3
 }
 ```
+
+### Submitted job Status
+
+Endpoint : `/blogs/status/<job_id>`
+
+Request:
+```bash
+GET /blogs/status/<job_id>
+```
+
+Response: 
+```json
+{
+  "data": {
+    "created_at": 1726170123780,
+    "status": "failed",
+    "user_id": "user4",
+    "title": "bbd hdbhi dhbhd shbh",
+    "error": "Blog post already exists: bbd hdbhi dhbhd shbh"
+  }
+}
+```
+
 
 ### Health_check
 
@@ -248,6 +277,14 @@ curl -X GET "http://localhost:9200/blogs/_mapping"
 - **Full-Text Search Enhancements**: Improve search with more complex queries such as fuzzy matching or boosting blog titles in results.
 - **Monitoring & Logging**: Integrate services like Prometheus and Grafana for real-time monitoring and log aggregation.
 
+
+
+
+# Deployment
+We can deploy service with kubernetes pods
+
+Deployment config file in available in deployment folder
+ 
 
 
 
