@@ -130,6 +130,18 @@ class ElasticsearchHandler:
             "from": start,
             "to": end
         }
+    
+    def update_doc_by_id(self, index, body, doc_id):
+        """
+        This method will update data in elasticsearch
+
+        :param index: Index name
+        :type index: str
+        :param body: Data to be updated
+        :type body: dict
+        :param doc_id: Document ID
+        """
+        return self.es.update(index=index, body=body, id=doc_id)
 
     # write a method to close the elasticsearch connection
     def close(self):

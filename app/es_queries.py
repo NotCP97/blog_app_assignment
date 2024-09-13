@@ -71,6 +71,6 @@ def user_submitted_blogs_query(user_id: str):
         "sort": {
             "created_at": {"order": "desc"}
         },
-        "_source": ["title", "user_id", "created_at", "status", "error"]
+        "_source": ["title", "user_id", "created_at", "status", "error", "text"]
     }
 

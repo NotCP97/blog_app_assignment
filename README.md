@@ -185,21 +185,24 @@ Response:
       "status": "failed",
       "user_id": "user4",
       "title": "bbd hdbhi dhbhd shbh",
-      "error": "Blog post already exists: bbd hdbhi dhbhd shbh"
+      "error": "Blog post already exists: bbd hdbhi dhbhd shbh",
+      "text": "This is the content of my blog."
     },
     {
       "created_at": 1726111451172,
       "status": "failed",
       "user_id": "user4",
       "title": "bbd hdbhi dhbhd shbh",
-      "error": "Blog post already exists: bbd hdbhi dhbhd shbh"
+      "error": "Blog post already exists: bbd hdbhi dhbhd shbh",
+       "text": "This is the content of my blog."
     },
     {
       "created_at": 1726111451006,
       "status": "success",
       "user_id": "user4",
       "title": "bbd hdbhi dhbhd shbh",
-      "error": ""
+      "error": "",
+      "text": "This is the content of my blog."
     }
   ],
    "total_hits": 3
@@ -225,7 +228,8 @@ Response:
     "status": "failed",
     "user_id": "user4",
     "title": "bbd hdbhi dhbhd shbh",
-    "error": "Blog post already exists: bbd hdbhi dhbhd shbh"
+    "error": "Blog post already exists: bbd hdbhi dhbhd shbh",
+    "text": "This is the content of my blog."
   }
 }
 ```
@@ -304,7 +308,15 @@ This will deploy the FastAPI service, Redis, and Elasticsearch on Kubernetes.
 we can access our service http://localhost:30001 as we did in local development
 
 ```bash
-api doc - http://localhost:30001/api/docs
+Swagger api doc - http://localhost:30001/api/docs
+```
+
+
+## Extra
+We can monitor our redis queue with rq-dashboard for Redis server
+
+```bash
+rq-dashboard -u ${REDIS_URL}
 ```
 
 
