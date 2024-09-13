@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: blog-service
 spec:
-  replicas: 5
+  replicas: 1
   selector:
     matchLabels:
       app: blog-service
@@ -44,7 +44,7 @@ kind: Deployment
 metadata:
   name: worker
 spec:
-  replicas: 3
+  replicas: 1
   selector:
     matchLabels:
       app: worker
