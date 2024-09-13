@@ -3,6 +3,7 @@ from clients import ElasticsearchHandler, RedisHandler
 from rq import Worker, Queue, Connection
 from hashlib import md5
 from loggerz import get_logger
+import time
 
 logger = get_logger()
 
@@ -59,4 +60,5 @@ if __name__ == '__main__':
             worker.work()
     except Exception as e:
         logger.error(f"Error: {e}")
+        time.sleep(10)
         raise e

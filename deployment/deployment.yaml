@@ -139,7 +139,7 @@ spec:
         ports:
         - containerPort: 6379
         
-        livenessProbe:          # Replace healthcheck with livenessProbe
+        livenessProbe:
           exec:
             command: ["redis-cli", "ping"]
           initialDelaySeconds: 30
