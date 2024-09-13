@@ -65,7 +65,7 @@ spec:
         - name: WORKERS_COUNT
           value: "1"
         
-        livenessProbe:          # Replace healthcheck with livenessProbe
+        livenessProbe:         
           exec:
             command: ["curl", "-f", "http://blog-service:8000/health_check"]
           initialDelaySeconds: 10
@@ -97,14 +97,14 @@ spec:
     spec:
       containers:
       - name: elasticsearch-service
-        image: docker.elastic.co/elasticsearch/elasticsearch:7.10.1
+        image: docker.elastic.co/elasticsearch/elasticsearch:7.14.0
         ports:
         - containerPort: 9200
         env:
         - name: discovery.type
           value: single-node
         
-        livenessProbe:          # Replace healthcheck with livenessProbe
+        livenessProbe:          
           exec:
             command: ["curl", "-f", "http://localhost:9200/_cat/health"]
           initialDelaySeconds: 30
