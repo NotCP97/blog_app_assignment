@@ -1,7 +1,7 @@
-fastapi
-uvicorn
-elasticsearch==7.13.1
-redis
-rq
-supervisor
-rq-dashboard
+fastapi==0.114.0
+uvicorn==0.30.6
+elasticsearch==8.15.0
+redis==5.0.8
+rq==1.16.2
+supervisor==4.2.5
+rq-dashboard==0.8.0.2
