@@ -37,6 +37,9 @@ The service follows a microservices-like architecture where:
 2. **Queue Consumer** processes the blog submissions from a Redis queue and writes them to an Elasticsearch database.
 3. **Search API** allows users to search through stored blog entries using Elasticsearch's full-text search capabilities.
 
+![screenshot](architecture.png)
+
+
 # Components
 
 The project includes the following:
