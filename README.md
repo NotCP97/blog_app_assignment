@@ -285,6 +285,19 @@ curl -X GET "http://localhost:9200/blogs/_mapping"
 We can deploy service with kubernetes pods
 
 Deployment config file in available in deployment folder
+
+```bash
+kubectl apply -f deployment/deployment.yaml
+```
+
+This will deploy the FastAPI service, Redis, and Elasticsearch on Kubernetes.
+
+we can access our service http://localhost:8000/api/docs as we did in local development
+
+
+
+
+
  
 
 

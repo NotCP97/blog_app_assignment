@@ -21,6 +21,9 @@ redis_handler = RedisHandler()
 
 @app.get("/health_check")
 def health_check():
+    """
+    This endpoint will return the status of the service
+    """
     return {"status": "ping pong"}
 
 @app.post("/blogs/submit")

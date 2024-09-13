@@ -14,7 +14,7 @@ services:
       - QUEUE=blog_processing_queue
     command: python3 main.py
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://elasticsearch:9200/_cat/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health_check || exit 1"]
       interval: 20s
       timeout: 10s
       retries: 5
@@ -51,6 +51,7 @@ services:
     depends_on:
       - redis
       - elasticsearch
+      - fastapi
     # ports:
     #   - "9181:9181"  # Uncomment this line if you want to expose the port for rq-dashboard
     environment:
@@ -59,7 +60,7 @@ services:
       - QUEUE=blog_processing_queue
     command: supervisord -c supervisord.conf
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://elasticsearch:9200/_cat/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://fastapi:8000/health_check || exit 1"]
       interval: 20s
       timeout: 10s
       retries: 5

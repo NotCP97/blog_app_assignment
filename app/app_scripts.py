@@ -10,6 +10,9 @@ from loggerz import get_logger
 logger = get_logger()
 
 def start_up():
+    """
+    This function will connect to Elasticsearch and create the required indices
+    """
     es_handler = ElasticsearchHandler()
 
     retries = 100  # Number of retries before exiting

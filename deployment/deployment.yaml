@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: blog-service
 spec:
-  replicas: 1
+  replicas: 5
   selector:
     matchLabels:
       app: blog-service
@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: blog-service
-        image: app:latest
+        image: chandrasaini/docker-images:3 
         ports:
         - containerPort: 8000
         env:
@@ -25,13 +25,26 @@ spec:
 
         command: ["python3", "main.py"]
 
+        livenessProbe:
+          exec:
+            command: ["curl", "-f", "http://localhost:8000/health_check"]
+          initialDelaySeconds: 10
+          periodSeconds: 20
+          timeoutSeconds: 10
+          failureThreshold: 50
+
+        readinessProbe:
+          exec:
+            command: ["curl", "-f", "http://localhost:8000/health_check"]
+          initialDelaySeconds: 5
+          periodSeconds: 15
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: worker
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: worker
@@ -42,7 +55,7 @@ spec:
     spec:
       containers:
       - name: worker
-        image: app:latest
+        image: chandrasaini/docker-images:3 
         command: ["supervisord", "-c", "supervisord.conf"]
         env:
         - name: REDIS_URL
@@ -51,7 +64,21 @@ spec:
           value: "http://elasticsearch-service:9200"
         - name: WORKERS_COUNT
           value: "1"
-
+        
+        livenessProbe:          # Replace healthcheck with livenessProbe
+          exec:
+            command: ["curl", "-f", "http://blog-service:8000/health_check"]
+          initialDelaySeconds: 10
+          periodSeconds: 20
+          timeoutSeconds: 10
+          failureThreshold: 50
+        
+        readinessProbe:
+          exec:
+            command: ["curl", "-f", "http://blog-service:8000/health_check"]
+          initialDelaySeconds: 5
+          periodSeconds: 15
+        
 
 ---
 apiVersion: apps/v1
@@ -76,6 +103,20 @@ spec:
         env:
         - name: discovery.type
           value: single-node
+        
+        livenessProbe:          # Replace healthcheck with livenessProbe
+          exec:
+            command: ["curl", "-f", "http://localhost:9200/_cat/health"]
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+        
+        readinessProbe:
+          exec:
+            command: ["curl", "-f", "http://localhost:9200/_cat/health"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
 
 ---
 apiVersion: apps/v1
@@ -97,6 +138,20 @@ spec:
         image: redis:latest
         ports:
         - containerPort: 6379
+        
+        livenessProbe:          # Replace healthcheck with livenessProbe
+          exec:
+            command: ["redis-cli", "ping"]
+          initialDelaySeconds: 30
+          periodSeconds: 30
+          timeoutSeconds: 10
+          failureThreshold: 5
+        
+        readinessProbe:
+          exec:
+            command: ["redis-cli", "ping"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
 
 ---
 apiVersion: v1
@@ -109,7 +164,48 @@ spec:
     app: blog-service
   ports:
     - protocol: TCP
-      port: 8000           # Cluster-internal port
-      targetPort: 8000      # The container's port (from the Deployment)
-      nodePort: 8000       # External port accessible on localhost
+      port: 8000           
+      targetPort: 8000     
+      nodePort: 30001     
 
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: elasticsearch-service
+spec:
+  ports:
+  - port: 9200
+    targetPort: 9200
+  selector:
+    app: elasticsearch-service
+
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+spec:
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    app: redis-service
+
+
+
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: blog-service
+# spec:
+#   type: LoadBalancer
+#   selector:
+#     app: blog-service
+#   ports:
+#     - protocol: TCP
+#       port: 80           # Expose externally on port 80
+#       targetPort: 8000    # The container's port (from the Deployment)
