@@ -298,7 +298,11 @@ kubectl apply -f deployment/deployment.yaml
 
 This will deploy the FastAPI service, Redis, and Elasticsearch on Kubernetes.
 
-we can access our service http://localhost:8000/api/docs as we did in local development
+we can access our service http://localhost:30001 as we did in local development
+
+```bash
+api doc - http://localhost:30001/api/docs
+```
 
 
 
