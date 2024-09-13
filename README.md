@@ -44,7 +44,7 @@ The service follows a microservices-like architecture where:
 
 The project includes the following:
 
-1. **FastAPI Backend** (`/app` folder)
+1. **FastAPI Backend** (`/app/main.py`)
    - Blog submission and search APIs
    - User specific api to track user submissions and submissions progress
    - Dockerized with a lightweight Python image
