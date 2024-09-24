@@ -2,7 +2,7 @@
 
 Hi readers,
 
-Creating this repository as part of CloudSEK recruitment assignment.
+Creating this repository as part of ***** recruitment assignment.
 
 Assumption  - We dont have separate redis and elastic search db
 
